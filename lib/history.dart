@@ -29,6 +29,10 @@ class _HistoryTransList extends State<HistoryTransList> {
   String alert;
   List plateData2;
   TextEditingController _textController;
+  // Define app package names
+  String oldPrinterPackageName = "com.example.cpcl_test_v1";
+  String newPrinterPackageName = "com.example.cpcl_test_v2";
+  String zebraPrinterPackageName = "com.example.cpcl_test_v3";
 
   Future getSyncDate() async{
     var res = await db.fetchSync();
@@ -315,25 +319,110 @@ class _HistoryTransList extends State<HistoryTransList> {
                                   new TextButton(
                                     child: new Text("Proceed"),
                                     onPressed:() async{
+
+                                      // Check if each app is installed
+                                      bool isOldPrinterInstalled = await DeviceApps.isAppInstalled(oldPrinterPackageName);
+                                      bool isNewPrinterInstalled = await DeviceApps.isAppInstalled(newPrinterPackageName);
+                                      bool isZebraPrinterInstalled = await DeviceApps.isAppInstalled(zebraPrinterPackageName);
+
                                       Navigator.of(context).pop();
-//                                      print(widget.empId);
-//                                      print('reprint_penalty');
-//                                        await db.olSendTransType(widget.empId,'reprint_penalty');
-//                                        await db.olPenaltyReprint(plateData[index]['d_uid'],plateData[index]['d_transcode'],plateData[index]['d_Plate'],plateData[index]['d_dateTimeIn'],plateData[index]['d_dateTimeout'],plateData[index]['d_amount'],plateData[index]['d_penalty'],plateData[index]['d_in_empid'],plateData[index]['out_empid'],plateData[index]['d_location']);
-                                        await fileCreate.transactionTypeFunc('reprint_penalty');
-                                        await fileCreate.transPenaltyFunc(plateData[index]['uid'],plateData[index]['checkDigit'],plateData[index]['plateNumber'],plateData[index]['dateTimein'],plateData[index]['dateTimeout'],plateData[index]['amount'],plateData[index]['penalty'],plateData[index]['user'],plateData[index]['empNameIn'],plateData[index]['outBy'],plateData[index]['empNameOut'],plateData[index]['location']);
-                                        DeviceApps.openApp("com.example.cpcl_test_v1").then((_) {
-                                        });
-//                                        print(plateData[index]['d_uid']);
-//                                        print(plateData[index]['d_transcode']);
-//                                        print(plateData[index]['d_Plate']);
-//                                        print(plateData[index]['d_dateTimeIn']);
-//                                        print(plateData[index]['d_dateTimeout']);
-//                                        print(plateData[index]['d_amount']);
-//                                        print(plateData[index]['d_penalty']);
-//                                        print(plateData[index]['d_in_empid']);
-//                                        print(plateData[index]['out_empid']);
-//                                        print(plateData[index]['d_location']);
+
+                                      Future<void> handlePrinterSelection(
+                                          BuildContext context,
+                                          String promptMessage,
+                                          String packageName,
+                                          ) async {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return CupertinoAlertDialog(
+                                              title: Text(promptMessage),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  child: Text("Proceed"),
+                                                  onPressed: () async {
+                                                    Navigator.of(context).pop();
+
+                                                    await fileCreate.transactionTypeFunc('reprint_penalty');
+                                                    await fileCreate.transPenaltyFunc(plateData[index]['uid'],plateData[index]['checkDigit'],plateData[index]['plateNumber'],plateData[index]['dateTimein'],plateData[index]['dateTimeout'],plateData[index]['amount'],plateData[index]['penalty'],plateData[index]['user'],plateData[index]['empNameIn'],plateData[index]['outBy'],plateData[index]['empNameOut'],plateData[index]['location']);
+
+                                                    // Open the external app
+                                                    await DeviceApps.openApp(packageName).then((_) {
+                                                    });
+
+                                                    print("PRINTING");
+                                                  },
+                                                ),
+                                                TextButton(
+                                                  child: Text("Cancel"),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      }
+
+                                      showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          // return object of type Dialog
+                                          return CupertinoAlertDialog(
+                                            title: Text("Select Printer"),
+                                            actions: <Widget>[
+                                              // Button to trigger the next dialog
+                                              TextButton(
+                                                child: Text("Old Printer"),
+                                                onPressed: isOldPrinterInstalled
+                                                    ? () async {
+                                                  Navigator.of(context).pop();
+                                                  await handlePrinterSelection(
+                                                    context,
+                                                    "Proceed printing with oldPrinter?",
+                                                    oldPrinterPackageName,
+                                                  );
+                                                }
+                                                    : null, // Disable button if app is not installed
+                                              ),
+                                              TextButton(
+                                                child: Text("New Printer"),
+                                                onPressed: isNewPrinterInstalled
+                                                    ? () async {
+                                                  Navigator.of(context).pop();
+                                                  await handlePrinterSelection(
+                                                    context,
+                                                    "Proceed printing with newPrinter?",
+                                                    newPrinterPackageName,
+                                                  );
+                                                }
+                                                    : null, // Disable button if app is not installed
+                                              ),
+                                              TextButton(
+                                                child: Text("Zebra ZR138"),
+                                                onPressed: isZebraPrinterInstalled
+                                                    ? () async {
+                                                  Navigator.of(context).pop();
+                                                  await handlePrinterSelection(
+                                                    context,
+                                                    "Proceed printing with Zebra-ZR138 printer?",
+                                                    zebraPrinterPackageName,
+                                                  );
+                                                }
+                                                    : null, // Disable button if app is not installed
+                                              ),
+                                              TextButton(
+                                                child: Text("Cancel", style: TextStyle(color: Colors.black),),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
                                     },
                                   ),
                                   new TextButton(

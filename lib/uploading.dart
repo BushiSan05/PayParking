@@ -44,10 +44,6 @@ class _UploadPage extends State<UploadPage> {
       statusText = "Uploading history data";
     });
 
-    // ConnectivityResult connectivityResult = await Connectivity().checkConnectivity();
-    // bool isLocalNetworkAvailable = connectivityResult == ConnectivityResult.wifi;
-
-//    bool result = await DataConnectionChecker().hasConnection;
     var res = await db.fetchAllHistory();
     setState(() {
       hisData = res;
@@ -78,50 +74,71 @@ class _UploadPage extends State<UploadPage> {
         outBy = hisData[i]['outBy'];
         location = hisData[i]['location'];
 
+        // Measuring time for slow connection detection
+        final stopwatch = Stopwatch()..start();
 
-        await http.post(Server.address + "sync_data", body: {
-          "uid": uid,
-          "checkDigit": checkDigit,
-          "plateNumber": plateNumber,
-          "dateTimeIn": dateTimeIn,
-          "dateTimeout": dateTimeout,
-          "amount": amount,
-          "penalty": penalty,
-          "user": user,
-          "outBy": outBy,
-          "location": location
-        });
+        try {
+          await http.post(Server.address + "sync_data", body: {
+            "uid": uid,
+            "checkDigit": checkDigit,
+            "plateNumber": plateNumber,
+            "dateTimeIn": dateTimeIn,
+            "dateTimeout": dateTimeout,
+            "amount": amount,
+            "penalty": penalty,
+            "user": user,
+            "outBy": outBy,
+            "location": location
+          });
 
-        updateProgress(i + 1, hisData.length);
+          stopwatch.stop();
 
-        if (i == hisData.length - 1) {
-          await db.emptyHistoryTbl();
+          // Check if the response took longer than expected (e.g., 2 seconds)
+          if (stopwatch.elapsedMilliseconds > 2000) {
+            Fluttertoast.showToast(
+              msg: "Slow connection detected, please wait...",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+            );
+          }
+
+          if (i == hisData.length - 1) {
+            await db.emptyHistoryTbl();
+          }
+        } catch (e) {
+          Fluttertoast.showToast(
+            msg: "An error occurred: Please check your network.",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+          );
+          return;
         }
+        updateProgress(i + 1, hisData.length);
       }
 
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return CupertinoAlertDialog(
-          title: new Text("Transactions Successfully Uploaded"),
-          content: new Text("Press ok to continue"),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new TextButton(
-              child: new Text("Ok"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-    print("okna!");
-  }
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return CupertinoAlertDialog(
+            title: new Text("Transactions Successfully Uploaded"),
+            content: new Text("Press ok to continue"),
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              new TextButton(
+                child: new Text("Ok"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      print("okna!");
+    }
   }
 
 

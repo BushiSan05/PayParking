@@ -30,6 +30,12 @@ class _ParkTransList extends State<ParkTransList>{
   TextEditingController _managerKeyUserPass;
   TextEditingController _managerKeyUser;
   TextEditingController  _textController;
+
+  // Define app package names
+  String oldPrinterPackageName = "com.example.cpcl_test_v1";
+  String newPrinterPackageName = "com.example.cpcl_test_v2";
+  String zebraPrinterPackageName = "com.example.cpcl_test_v3";
+
 //  Timer timer;
 //  Future getTransData() async {
 //    var res = await db.fetchAll();
@@ -84,18 +90,110 @@ class _ParkTransList extends State<ParkTransList>{
     final dateNow = DateFormat("yyyy-MM-dd : H:mm").format(dateTimeNow);
     var amountPay = amount;
 
+    // Check if each app is installed
+    bool isOldPrinterInstalled = await DeviceApps.isAppInstalled(oldPrinterPackageName);
+    bool isNewPrinterInstalled = await DeviceApps.isAppInstalled(newPrinterPackageName);
+    bool isZebraPrinterInstalled = await DeviceApps.isAppInstalled(zebraPrinterPackageName);
 
+    Future<void> handlePrinterSelection(
+        BuildContext context,
+        String promptMessage,
+        String packageName,
+        ) async {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text(promptMessage),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Proceed"),
+                onPressed: () async {
+                  Navigator.of(context).pop();
 
-//      await db.olAddTransHistory(id,uid,checkDigit,plateNumber,dateIn,dateNow,amountPay.toString(),penalty.toString(),user.toString(),outBy.toString(),location.toString());
-      await db.addTransHistory(uid,checkDigit,plateNumber,dateIn,dateNow,amountPay.toString(),penalty.toString(),user.toString(),empNameIn.toString(),outBy.toString(),empNameOut.toString(),location.toString());
-      await db.updatePayTranStat(id);
-      await fileCreate.transactionTypeFunc('print_penalty');
-      await fileCreate.transPenaltyFunc(uid,checkDigit,plateNumber,dateIn,dateNow,amountPay.toString(),penalty.toString(),user.toString(),empNameIn.toString(),outBy.toString(),empNameOut.toString(),location.toString());
-      getTransData();
+                  await db.addTransHistory(uid,checkDigit,plateNumber,dateIn,dateNow,amountPay.toString(),penalty.toString(),user.toString(),empNameIn.toString(),outBy.toString(),empNameOut.toString(),location.toString());
+                  await db.updatePayTranStat(id);
+                  await fileCreate.transactionTypeFunc('print_penalty');
+                  await fileCreate.transPenaltyFunc(uid,checkDigit,plateNumber,dateIn,dateNow,amountPay.toString(),penalty.toString(),user.toString(),empNameIn.toString(),outBy.toString(),empNameOut.toString(),location.toString());
+                  getTransData();
 
-//      await db.olSendTransType(widget.empId,'penalty');
-     DeviceApps.openApp("com.example.cpcl_test_v1").then((_) {
-      });
+                  // Open the external app
+                  await DeviceApps.openApp(packageName).then((_) {
+                  });
+
+                  print("PRINTING");
+                },
+              ),
+              TextButton(
+                child: Text("Cancel"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return CupertinoAlertDialog(
+          title: Text("Select Printer"),
+          actions: <Widget>[
+            // Button to trigger the next dialog
+            TextButton(
+              child: Text("Old Printer"),
+              onPressed: isOldPrinterInstalled
+                  ? () async {
+                Navigator.of(context).pop();
+                await handlePrinterSelection(
+                  context,
+                  "Proceed printing with oldPrinter?",
+                  oldPrinterPackageName,
+                );
+              }
+                  : null, // Disable button if app is not installed
+            ),
+            TextButton(
+              child: Text("New Printer"),
+              onPressed: isNewPrinterInstalled
+                  ? () async {
+                Navigator.of(context).pop();
+                await handlePrinterSelection(
+                  context,
+                  "Proceed printing with newPrinter?",
+                  newPrinterPackageName,
+                );
+              }
+                  : null, // Disable button if app is not installed
+            ),
+            TextButton(
+              child: Text("Zebra ZR138"),
+              onPressed: isZebraPrinterInstalled
+                  ? () async {
+                Navigator.of(context).pop();
+                await handlePrinterSelection(
+                  context,
+                  "Proceed printing with Zebra-ZR138 printer?",
+                  zebraPrinterPackageName,
+                );
+              }
+                  : null, // Disable button if app is not installed
+            ),
+            TextButton(
+              child: Text("Cancel", style: TextStyle(color: Colors.black),),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
 
     Fluttertoast.showToast(
         msg: "Successfully added to history",
@@ -117,28 +215,127 @@ class _ParkTransList extends State<ParkTransList>{
         plateData2 = res;
       });
   }
-//  managerLoginReprint(plateData[index]['d_uid'],plateData[index]["d_chkdigit"],plateData[index]["d_Plate"],plateData[index]['d_dateToday'],plateData[index]["d_dateTimeToday"],plateData[index]['d_amount'],plateData[index]["d_emp_id"],plateData[index]['d_location']);
 
-  Future managerLoginReprint(uid,checkDigit,plateNo,dateToday,dateTimeToday,dateUntil,amount,empId,location) async{
-//    bool result = await DataConnectionChecker().hasConnection;
-      print(plateNo);
-//      var res = await db.olManagerLogin(_managerKeyUser.text,_managerKeyUserPass.text);
+  Future managerLoginReprint(uid,checkDigit,plateNo,dateToday,dateTimeToday,dateUntil,amount,empId,location,appName) async{
 
+    print(plateNo);
     var res = await db.ofManagerLogin(_managerKeyUser.text,_managerKeyUserPass.text);
-//          print(res);
+
     setState(() {
       data = res;
     });
+
+    // Check if each app is installed
+    bool isOldPrinterInstalled = await DeviceApps.isAppInstalled(oldPrinterPackageName);
+    bool isNewPrinterInstalled = await DeviceApps.isAppInstalled(newPrinterPackageName);
+    bool isZebraPrinterInstalled = await DeviceApps.isAppInstalled(zebraPrinterPackageName);
+
      if(data.isNotEmpty){
         _managerKeyUser.clear();
         _managerKeyUserPass.clear();
-//        await db.olSendTransType(widget.empId,'reprint');
-//        await db.olReprintCouponTicket(uid,checkDigit,plateNo,dateToday,dateTimeToday,dateUntil,amount,empId,location);
-         await fileCreate.transactionTypeFunc('reprint_coupon');
-         await fileCreate.transactionsFunc(uid,checkDigit,plateNo,dateToday,dateTimeToday,dateUntil,amount,empId,location);
 
-        DeviceApps.openApp("com.example.cpcl_test_v1").then((_) {
-        });
+        Future<void> handlePrinterSelection(
+            BuildContext context,
+            String promptMessage,
+            String packageName,
+            ) async {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CupertinoAlertDialog(
+                title: Text(promptMessage),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text("Proceed"),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+
+                      await fileCreate.transactionTypeFunc('reprint_coupon');
+                      await fileCreate.transactionsFunc(uid,checkDigit,plateNo,dateToday,dateTimeToday,dateUntil,amount,empId,location);
+
+                      // Open the external app
+                      await DeviceApps.openApp(packageName).then((_) {
+                      });
+
+                      print("PRINTING");
+                    },
+                  ),
+                  TextButton(
+                    child: Text("Cancel"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+         //
+         // await fileCreate.transactionTypeFunc('reprint_coupon');
+         // await fileCreate.transactionsFunc(uid,checkDigit,plateNo,dateToday,dateTimeToday,dateUntil,amount,empId,location);
+
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return CupertinoAlertDialog(
+              title: Text("Select Printer"),
+              actions: <Widget>[
+                // Button to trigger the next dialog
+                TextButton(
+                  child: Text("Old Printer"),
+                  onPressed: isOldPrinterInstalled
+                      ? () async {
+                    Navigator.of(context).pop();
+                    await handlePrinterSelection(
+                      context,
+                      "Proceed printing with oldPrinter?",
+                      oldPrinterPackageName,
+                    );
+                  }
+                      : null, // Disable button if app is not installed
+                ),
+                TextButton(
+                  child: Text("New Printer"),
+                  onPressed: isNewPrinterInstalled
+                      ? () async {
+                    Navigator.of(context).pop();
+                    await handlePrinterSelection(
+                      context,
+                      "Proceed printing with newPrinter?",
+                      newPrinterPackageName,
+                    );
+                  }
+                      : null, // Disable button if app is not installed
+                ),
+                TextButton(
+                  child: Text("Zebra ZR138"),
+                  onPressed: isZebraPrinterInstalled
+                      ? () async {
+                    Navigator.of(context).pop();
+                    await handlePrinterSelection(
+                      context,
+                      "Proceed printing with Zebra-ZR138 printer?",
+                      zebraPrinterPackageName,
+                    );
+                  }
+                      : null, // Disable button if app is not installed
+                ),
+                TextButton(
+                  child: Text("Cancel", style: TextStyle(color: Colors.black),),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+
+        // DeviceApps.openApp("com.example.cpcl_test_v1").then((_) {
+        // });
       }
       if(data.isEmpty){
         _managerKeyUser.clear();
@@ -164,7 +361,6 @@ class _ParkTransList extends State<ParkTransList>{
           },
         );
       }
-
   }
 
 
@@ -538,12 +734,6 @@ class _ParkTransList extends State<ParkTransList>{
                                   new TextButton(
                                     child: new Text(alertButton),
                                     onPressed: () {
-//                                       if(trigger == 0){
-//                                         passDataToHistoryWithOutPay(int.parse(plateData[index]["d_id"]),plateData[index]["d_Plate"],dateTimeIn,DateTime.now(),plateData[index]["d_amount"],plateData[index]["d_emp_id"],plateData[index]['d_user'],widget.empId,widget.name,plateData[index]["d_location"]);
-//                                       }
-//                                       if(trigger == 1){
-//                                         passDataToHistoryWithPay(int.parse(plateData[index]["d_id"]),plateData[index]["d_Plate"],dateTimeIn,DateTime.now(),plateData[index]["d_amount"],penalty,plateData[index]["d_emp_id"],plateData[index]['d_user'],widget.empId,widget.name,plateData[index]["d_location"]);
-//                                       }
                                       Navigator.of(context).pop();
                                       showDialog(
                                         barrierDismissible: true,
@@ -679,11 +869,6 @@ class _ParkTransList extends State<ParkTransList>{
                                   new TextButton(
                                     child: new Text("Reprint"),
                                     onPressed: (){
-//                                        couponPrint.sample(plateData[index]["d_Plate"],DateFormat("yyyy-MM-dd").format(dateTimeIn),DateFormat("hh:mm a").format(dateTimeIn),DateFormat("yyyy-MM-dd").format(dateTimeIn.add(new Duration(days: 7))),plateData[index]['d_amount'],"ppd","12","location");
-//                                          Navigator.push(
-//                                             context,
-//                                             MaterialPageRoute(builder: (context) => Reprint(id:plateData[index]["d_id"],fullName:widget.empNameFn,username:widget.name,uid:plateData[index]["d_uid"],plateNo:plateData[index]["d_Plate"])),
-//                                          );
                                       Navigator.of(context).pop();
                                       showDialog(
                                         barrierDismissible: true,
@@ -713,7 +898,7 @@ class _ParkTransList extends State<ParkTransList>{
                                                 child: new Text("Proceed"),
                                                 onPressed:(){
                                                   Navigator.of(context).pop();
-                                                    managerLoginReprint(plateData[index]['uid'],plateData[index]["chekDigit"],plateData[index]["plateNumber"],plateData[index]['dateToday'],plateData[index]["dateTimeToday"],plateData[index]['dateUntil'],plateData[index]['amount'],plateData[index]["user"],plateData[index]['location']);
+                                                    managerLoginReprint(plateData[index]['uid'],plateData[index]["chekDigit"],plateData[index]["plateNumber"],plateData[index]['dateToday'],plateData[index]["dateTimeToday"],plateData[index]['dateUntil'],plateData[index]['amount'],plateData[index]["user"],plateData[index]['location'], plateData[index]['appName']);
                                                   }
                                               ),
                                               new TextButton(
@@ -728,53 +913,6 @@ class _ParkTransList extends State<ParkTransList>{
                                       );
                                     },
                                   ),
-//                                  new FlatButton(
-//                                    child: new Text("Cancellation"),
-//                                    onPressed: enabled ? () {
-//                                      Navigator.of(context).pop();
-//                                      showDialog(
-//                                        barrierDismissible: true,
-//                                        context: context,
-//                                        builder: (BuildContext context) {
-//                                          // return object of type Dialog
-//                                          return CupertinoAlertDialog(
-//                                            title: new Text("Manager's key"),
-//                                            content: new Column(
-//                                              children: <Widget>[
-//                                                new CupertinoTextField(
-//                                                  autofocus: true,
-//                                                  placeholder: "Username",
-//                                                  controller: _managerKeyUser,
-//                                                ),
-//                                                Divider(),
-//                                                new CupertinoTextField(
-//                                                  autofocus: true,
-//                                                  placeholder: "Password",
-//                                                  controller: _managerKeyUserPass,
-//                                                  obscureText: true,
-//                                                ),
-//                                              ],
-//                                            ),
-//                                            actions: <Widget>[
-//                                              new FlatButton(
-//                                                child: new Text("Proceed"),
-//                                                onPressed:(){
-//                                                  Navigator.of(context).pop();
-//                                                  managerCancel(plateData[index]['plateNumber'],plateData[index]["id"]);
-//                                                },
-//                                              ),
-//                                              new FlatButton(
-//                                                child: new Text("Close"),
-//                                                onPressed:(){
-//                                                  Navigator.of(context).pop();
-//                                                },
-//                                              ),
-//                                            ],
-//                                          );
-//                                        },
-//                                      );
-//                                    } : null,
-//                                  ),
                                   new TextButton(
                                     child: new Text("Close"),
                                     onPressed: () {
@@ -1001,12 +1139,6 @@ class _ParkTransList extends State<ParkTransList>{
                                   new TextButton(
                                     child: new Text(alertButton),
                                     onPressed: () {
-//                                       if(trigger == 0){
-//                                         passDataToHistoryWithOutPay(int.parse(plateData[index]["d_id"]),plateData[index]["d_Plate"],dateTimeIn,DateTime.now(),plateData[index]["d_amount"],plateData[index]["d_emp_id"],plateData[index]['d_user'],widget.empId,widget.name,plateData[index]["d_location"]);
-//                                       }
-//                                       if(trigger == 1){
-//                                         passDataToHistoryWithPay(int.parse(plateData[index]["d_id"]),plateData[index]["d_Plate"],dateTimeIn,DateTime.now(),plateData[index]["d_amount"],penalty,plateData[index]["d_emp_id"],plateData[index]['d_user'],widget.empId,widget.name,plateData[index]["d_location"]);
-//                                       }
                                       Navigator.of(context).pop();
                                       showDialog(
                                         barrierDismissible: true,
@@ -1143,11 +1275,6 @@ class _ParkTransList extends State<ParkTransList>{
                                   new TextButton(
                                     child: new Text("Reprint"),
                                     onPressed: (){
-//                                        couponPrint.sample(plateData[index]["d_Plate"],DateFormat("yyyy-MM-dd").format(dateTimeIn),DateFormat("hh:mm a").format(dateTimeIn),DateFormat("yyyy-MM-dd").format(dateTimeIn.add(new Duration(days: 7))),plateData[index]['d_amount'],"ppd","12","location");
-//                                          Navigator.push(
-//                                             context,
-//                                             MaterialPageRoute(builder: (context) => Reprint(id:plateData[index]["d_id"],fullName:widget.empNameFn,username:widget.name,uid:plateData[index]["d_uid"],plateNo:plateData[index]["d_Plate"])),
-//                                          );
                                       Navigator.of(context).pop();
                                       showDialog(
                                         barrierDismissible: true,
@@ -1156,11 +1283,6 @@ class _ParkTransList extends State<ParkTransList>{
                                           // return object of type Dialog
                                           return CupertinoAlertDialog(
                                             title: new Text("Manager's key"),
-//                                            content: CupertinoTextField(
-//                                              obscureText: true,
-//                                              controller: _managerKey,
-//                                              autofocus: true,
-//                                            )
                                             content: new Column(
                                               children: <Widget>[
 
@@ -1184,7 +1306,7 @@ class _ParkTransList extends State<ParkTransList>{
                                                 child: new Text("Proceed"),
                                                 onPressed:(){
                                                   Navigator.of(context).pop();
-                                                  managerLoginReprint(plateData[index]['uid'],plateData[index]["checkDigit"],plateData[index]["plateNumber"],plateData[index]['dateToday'],plateData[index]["dateTimeToday"],plateData[index]['dateUntil'],plateData[index]['amount'],plateData[index]["empId"],plateData[index]['location']);
+                                                  managerLoginReprint(plateData[index]['uid'],plateData[index]["checkDigit"],plateData[index]["plateNumber"],plateData[index]['dateToday'],plateData[index]["dateTimeToday"],plateData[index]['dateUntil'],plateData[index]['amount'],plateData[index]["empId"],plateData[index]['location'],plateData[index]['appName']);
                                                 },
                                               ),
                                               new TextButton(
@@ -1199,55 +1321,6 @@ class _ParkTransList extends State<ParkTransList>{
                                       );
                                     },
                                   ),
-//                                  new FlatButton(
-//                                    child: new Text("Cancellation"),
-//                                    onPressed: enabled ? () {
-//                                      Navigator.of(context).pop();
-//                                      showDialog(
-//                                        barrierDismissible: true,
-//                                        context: context,
-//                                        builder: (BuildContext context) {
-//                                          // return object of type Dialog
-//                                          return CupertinoAlertDialog(
-//                                            title: new Text("Manager's key"),
-//                                            content: new Column(
-//                                              children: <Widget>[
-//
-//                                                new CupertinoTextField(
-//                                                  autofocus: true,
-//                                                  placeholder: "Username",
-//                                                  controller: _managerKeyUser,
-//                                                ),
-//                                                Divider(),
-//                                                new CupertinoTextField(
-//                                                  autofocus: true,
-//                                                  placeholder: "Password",
-//                                                  controller: _managerKeyUserPass,
-//                                                  obscureText: true,
-//                                                ),
-//
-//                                              ],
-//                                            ),
-//                                            actions: <Widget>[
-//                                              new FlatButton(
-//                                                child: new Text("Proceed"),
-//                                                onPressed:(){
-//                                                  Navigator.of(context).pop();
-//                                                  managerCancel(plateData[index]['plateNumber'],plateData[index]["id"]);
-//                                                },
-//                                              ),
-//                                              new FlatButton(
-//                                                child: new Text("Close"),
-//                                                onPressed:(){
-//                                                  Navigator.of(context).pop();
-//                                                },
-//                                              ),
-//                                            ],
-//                                          );
-//                                        },
-//                                      );
-//                                    } : null,
-//                                  ),
                                   new TextButton(
                                     child: new Text("Close"),
                                     onPressed: () {

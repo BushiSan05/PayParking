@@ -4,7 +4,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'parkingtrans.dart';
 import 'parkingTransList.dart';
 import 'history.dart';
-import  'settings.dart';
+import 'settings.dart';
+import 'about.dart';
 import 'utils/db_helper.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -106,7 +107,7 @@ class _Home extends State<HomeT> {
     getUserData();
     super.initState();
     getCounter();
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => getCounter());
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => getCounter());
 //    if (state == BluetoothState.off) {
 //      print("bluetooth is off");
 //    }
@@ -190,10 +191,12 @@ class _Home extends State<HomeT> {
             icon: Icon(CupertinoIcons.home,size: 25.0),
             label: 'Park me'
           ),
+
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.collections,size: 25.0),
               label: 'Transactions'
           ),
+
           BottomNavigationBarItem(
             icon: new Stack(
               children: <Widget>[
@@ -224,10 +227,16 @@ class _Home extends State<HomeT> {
             ),
               label: 'History'
           ),
+
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person,size: 25.0),
               label: 'User'
           ),
+
+            // BottomNavigationBarItem(
+            //     icon: Icon(CupertinoIcons.info_circle,size: 25.0),
+            //     label: 'About Us'
+            // ),
         ],
       ),
       tabBuilder: (context, index) {
@@ -262,6 +271,13 @@ class _Home extends State<HomeT> {
               );
             });
             break;
+          // case 4:
+          //   returnValue = CupertinoTabView(builder: (context) {
+          //     return CupertinoPageScaffold(
+          //       child: About(),
+          //     );
+          //   });
+          //   break;
         }
         return returnValue;
       },

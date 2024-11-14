@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:payparkingv4/server.dart';
+import 'package:payparkingv4/update_screen.dart';
 import 'package:payparkingv4/utils/file_creator.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'home.dart';
 import 'package:gradient_text/gradient_text.dart';
 import 'utils/db_helper.dart';
@@ -13,6 +16,8 @@ import 'constants.dart';
 import 'syncing.dart';
 import 'about.dart';
 import 'package:http/http.dart' as http;
+import 'package:payparkingv4/api.dart';
+import 'package:payparkingv4/app_update.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -28,9 +33,21 @@ class _SignInPageState extends State<SignInPage> {
   bool isLoggedIn = false;
   bool passwordVisible=false;
   List data;
+  bool btnUpdateClick = true;
+  var version = AppUpdateVersion().versionNumber();
 
   Future createDatabase() async{
      await db.init();
+  }
+
+  void requestStoragePermission() async {
+    PermissionStatus status = await Permission.storage.request();
+
+    if (status.isGranted) {
+      print('Storage permission granted');
+    } else {
+      print('Storage permission denied');
+    }
   }
 
   void log(){
@@ -95,36 +112,13 @@ class _SignInPageState extends State<SignInPage> {
           },
         );
       }
-//    }
-//    else{
-//      Navigator.of(context).pop();
-//      showDialog(
-//        barrierDismissible: true,
-//        context: context,
-//        builder: (BuildContext context) {
-//          // return object of type Dialog
-//          return CupertinoAlertDialog(
-//            title: new Text("Connection Problem"),
-//            content: new Text("Please Connect to the wifi hotspot or turn your wifi on"),
-//            actions: <Widget>[
-//              // usually buttons at the bottom of the dialog
-//              new FlatButton(
-//                child: new Text("Close"),
-//                onPressed: () {
-//                  Navigator.of(context).pop();
-//                },
-//              ),
-//            ],
-//          );
-//        },
-//      );
-//    }
   }
 
   @override
   void initState(){
     initPlatformState();
     super.initState();
+    requestStoragePermission();
     createDatabase();
     fileCreate.createFolder();
     passwordVisible=true;
@@ -302,21 +296,17 @@ class _SignInPageState extends State<SignInPage> {
       ),
     );
   }
-  void choiceAction(String choice){
+  Future<void> choiceAction(String choice) async {
     if(choice == Constants.dbSync){
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => SyncingPage()),
-      ).then((result) {
-
-      });
+      );
     }
     if(choice == Constants.about){
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => About()),
-      ).then((result) {
-      }
       );
     }
   }

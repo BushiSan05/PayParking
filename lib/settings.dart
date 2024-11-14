@@ -96,13 +96,13 @@ class _Settings extends State<Settings>{
                             },
                           ),
                         ],
-
                       );
                     }
                 );
               }
           ),
         ],
+
       ),
 
       body:Column(
@@ -130,27 +130,11 @@ class _Settings extends State<Settings>{
                             color: Colors.transparent,
                             height: 60.0,
                           ),
-//                          FlatButton(
-//                            child: new Text('Log Out'.toString(),style: TextStyle(fontSize: width/30.0, color: Colors.grey),),
-//                            color: Colors.transparent,
-//                            padding: EdgeInsets.symmetric(horizontal:width/150.0,vertical: 20.0),
-//                            shape: RoundedRectangleBorder(
-//                                borderRadius: new BorderRadius.circular(30.0),
-//                                side: BorderSide(color: Colors.lightBlue)
-//                            ),
-//                            onPressed:(){
-//                              Navigator.push(
-//                                   context,
-//                                    MaterialPageRoute(builder: (context) => SignInPage()),
-//                                  );
-////                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) =>  SignInPage()));
-//                            },
-//                          ),
                           Divider(
                             color: Colors.transparent,
                           ),
                           TextButton(
-                            child: new Text('172.16.46.130'.toString(),style: TextStyle(fontSize: width/31.0, color: Colors.grey),),
+                            child: new Text('Server'.toString(),style: TextStyle(fontSize: width/31.0, color: Colors.grey),),
                             style: TextButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               // foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
@@ -158,11 +142,6 @@ class _Settings extends State<Settings>{
                               shape: RoundedRectangleBorder(  borderRadius: new BorderRadius.circular(20.0),
                                     side: BorderSide(color: Colors.lightBlue))
                             ),
-                            // padding: EdgeInsets.symmetric(horizontal:width/150.0,vertical: 20.0),
-                            // shape: RoundedRectangleBorder(
-                            //     borderRadius: new BorderRadius.circular(30.0),
-                            //     side: BorderSide(color: Colors.lightBlue)
-                            // ),
                             onPressed:(){
                               Fluttertoast.showToast(
                                   msg: Server.address,
@@ -173,22 +152,8 @@ class _Settings extends State<Settings>{
                                   textColor: Colors.white,
                                   fontSize: 16.0
                               );
-//                              Navigator.popUntil(context, ModalRoute.withName('/login'));
-//                              Navigator.popUntil(context, ModalRoute.withName('/SignInPage'));
                             },
                           ),
-//                          FlatButton(
-//                            child: new Text('Connect to a Printer'.toString(),style: TextStyle(fontSize: width/31.0, color: Colors.grey),),
-//                            color: Colors.transparent,
-//                            padding: EdgeInsets.symmetric(horizontal:width/15.0,vertical: 5.0),
-//                            shape: RoundedRectangleBorder(
-//                                borderRadius: new BorderRadius.circular(35.0),
-//                                side: BorderSide(color: Colors.lightBlue)
-//                            ),
-//                            onPressed:(){
-//                              _getDeviceItems();
-//                            },
-//                          ),
                         ],
                       )
                     ],

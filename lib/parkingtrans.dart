@@ -299,6 +299,16 @@ class _ParkTrans extends State<ParkTrans>{
       var checkDigitResult = create(checkDigitNum);
       //check digit
 
+      // Define app package names
+      String oldPrinterPackageName = "com.example.cpcl_test_v1";
+      String newPrinterPackageName = "com.example.cpcl_test_v2";
+      String zebraPrinterPackageName = "com.example.cpcl_test_v3";
+
+      // Check if each app is installed
+      bool isOldPrinterInstalled = await DeviceApps.isAppInstalled(oldPrinterPackageName);
+      bool isNewPrinterInstalled = await DeviceApps.isAppInstalled(newPrinterPackageName);
+      bool isZebraPrinterInstalled = await DeviceApps.isAppInstalled(zebraPrinterPackageName);
+
       if(isSwitched == true){
         plateNumber = checkDigitResult;
         print(plateNumber);
@@ -307,49 +317,118 @@ class _ParkTrans extends State<ParkTrans>{
         print(plateNumber);
       }
 
-
-        String locationAnew = locationA;
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-          // return object of type Dialog
+    String locationAnew = locationA;
+    Future<void> handlePrinterSelection(
+        BuildContext context,
+        String promptMessage,
+        String packageName,
+        ) async {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
           return CupertinoAlertDialog(
-            title: new Text("Hello"),
-            content: new Text("Press Proceed to print Coupon and ticket"),
+            title: Text(promptMessage),
             actions: <Widget>[
-              // usually buttons at the bottom of the dialog
-              new TextButton(
-                child: new Text("Proceed"),
-                onPressed: () async{
+              TextButton(
+                child: Text("Proceed"),
+                onPressed: () async {
                   Navigator.of(context).pop();
+
+                  // Clear the plate number field
                   plateNoController.text = "";
-//                  await db.olSaveTransaction(uid,checkDigitResult,plateNumber,dateToday,dateTimeToday,dateUntil,amount,user,stat,locationAnew);
-                  await db.ofSaveTransaction(uid,checkDigitResult,plateNumber,dateToday,dateTimeToday,dateUntil,amount,empId,fName,stat,locationAnew);
-//                  await db.olSendTransType(widget.empId,'ticket');
+
+                  // Save transaction
+                  await db.ofSaveTransaction(uid, checkDigitResult, plateNumber, dateToday, dateTimeToday, dateUntil, amount, empId, fName, stat, locationAnew);
                   await fileCreate.transactionTypeFunc('print_coupon');
-                  await fileCreate.transactionsFunc(uid,checkDigitResult,plateNumber,dateToday,dateTimeToday,dateUntil,amount,empId,locationAnew);
-                  DeviceApps.openApp("com.example.cpcl_test_v1").then((_) {
+                  await fileCreate.transactionsFunc(uid, checkDigitResult, plateNumber, dateToday, dateTimeToday, dateUntil, amount, empId, locationAnew);
+
+                  // Open the external app
+                  await DeviceApps.openApp(packageName).then((_) {
                     Fluttertoast.showToast(
-                        msg: "Successfully added to transactions",
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIos: 2,
-                        backgroundColor: Colors.black54,
-                        textColor: Colors.white,
-                        fontSize: 16.0
+                      msg: "Successfully added to transactions",
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.BOTTOM,
+                      backgroundColor: Colors.black54,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
                     );
                   });
-                  print("PRINTING");
 
-//                  Navigator.of(context).pop();
+                  print("PRINTING");
+                  locationA = "Location";
+                },
+              ),
+              TextButton(
+                child: Text("Cancel"),
+                onPressed: () {
+                  Navigator.of(context).pop();
                 },
               ),
             ],
           );
         },
       );
-      locationA = "Location";
+    }
+
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+          // return object of type Dialog
+            return CupertinoAlertDialog(
+              title: Text("Select Printer"),
+              actions: <Widget>[
+                            // Button to trigger the next dialog
+                TextButton(
+                  child: Text("Old Printer"),
+                  onPressed: isOldPrinterInstalled
+                      ? () async {
+                    Navigator.of(context).pop();
+                    await handlePrinterSelection(
+                      context,
+                      "Proceed printing with oldPrinter?",
+                      oldPrinterPackageName,
+                    );
+                  }
+                  : null, // Disable button if app is not installed
+                ),
+                TextButton(
+                  child: Text("New Printer"),
+                  onPressed: isNewPrinterInstalled
+                      ? () async {
+                    Navigator.of(context).pop();
+                    await handlePrinterSelection(
+                      context,
+                      "Proceed printing with newPrinter?",
+                      newPrinterPackageName,
+                    );
+                  }
+                      : null, // Disable button if app is not installed
+                ),
+                TextButton(
+                  child: Text("Zebra ZR138"),
+                  onPressed: isZebraPrinterInstalled
+                      ? () async {
+                    Navigator.of(context).pop();
+                    await handlePrinterSelection(
+                      context,
+                      "Proceed printing with Zebra-ZR138 printer?",
+                      zebraPrinterPackageName,
+                    );
+                  }
+                      : null, // Disable button if app is not installed
+                ),
+                TextButton(
+                    child: Text("Cancel", style: TextStyle(color: Colors.black),),
+                onPressed: () {
+                      Navigator.of(context).pop();
+                },
+                ),
+              ],
+            );
+          },
+        );
+      // locationA = "Location";
   }
 
   @override

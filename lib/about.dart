@@ -1,76 +1,140 @@
 import 'package:flutter/material.dart';
 
-
-class About extends StatefulWidget{
+class About extends StatefulWidget {
   @override
-  _About createState() => new _About();
+  _AboutState createState() => _AboutState();
 }
-class _About extends State<About>{
 
-  @override
-  void initState(){
-    super.initState();
-  }
-  @override
-  void dispose() {
-
-    super.dispose();
-  }
-
+class _AboutState extends State<About> {
   @override
   Widget build(BuildContext context) {
+    // Fetch screen size
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
+    // Calculate sizing based on screen width
+    double avatarRadius = screenWidth * 0.10;  // Example: 15% of screen width
+    double spacingVertical = screenHeight * 0.03;
+    double spacingHorizontal = screenWidth * 0.05;
+    double textSpacing = screenWidth * 0.02;
 
-    return new Scaffold(
-      body:  ListView(
-          children: <Widget>[
-           Center(
-             child: Column(
-               children: <Widget>[
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('ABOUT US'),
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              SizedBox(height: spacingVertical),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(width: spacingHorizontal),
+                  ProfileAvatar(screenWidth, avatarRadius, 'assets/maamnel.jpg', "Maria Neliza Fuertes", "Group Managing Director"),
+                  SizedBox(width: spacingHorizontal),
+                  ProfileAvatar(screenWidth, avatarRadius, 'assets/maamtina.jpg', "Maria Cristina C. Evarle", "Supervisor/System Analyst"),
+                  SizedBox(height: spacingVertical),
+                ],
+              ),
+              SizedBox(height: spacingVertical + 50),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(width: spacingHorizontal),
+                  ProfileAvatar(screenWidth, avatarRadius, 'assets/renan.jpg', "Renan A. Ocoy", "Former Programmer"),
+                  SizedBox(width: spacingHorizontal + 50),
+                  ProfileAvatar(screenWidth, avatarRadius, 'assets/pj.jpg', "Paul Jearic P. Niones", "Former Programmer"),
+                  SizedBox(height: spacingVertical),
+                ],
+              ),
+              SizedBox(height: spacingVertical + 50),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ProfileAvatar(screenWidth, avatarRadius, 'assets/james.jpg', "James Matthew P. Remolador", "Programmer"),
+                  SizedBox(width: spacingHorizontal),
+                  ProfileAvatar(screenWidth, avatarRadius, 'assets/jomari.jpg', "Jomari Galleros", "Programmer"),
+                  SizedBox(height: spacingVertical),
+                ],
+              ),
+            SizedBox(height: spacingVertical + 120),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("For questions and support, please contact CORP. IT-SYSDEV", style: TextStyle(fontSize: 12.0),),
+                    ],
+                ),
+              SizedBox(height: 5.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("IP Phone Numbers: 1951 / 1953 / 1847", style: TextStyle(fontSize: 12.0),),
+                ],
+              ),
+          ]
+        ),
+      ),
+      ),
+    );
+  }
 
-                 SizedBox(
-                   height: 50,
-                 ),
-                  Text("App Developers",style:TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-                 SizedBox(
-                   height: 50,
-                 ),
-                 CircleAvatar(
-                   radius: 100.0,
-                   backgroundImage:
-                   AssetImage('assets/renan.jpg'),
-                   backgroundColor: Colors.transparent,
-                 ),
-                 SizedBox(
-                   height: 10,
-                 ),
-                 Text("Renan A. Ocoy",style:TextStyle(fontSize: 20),),
-
-                 SizedBox(
-                   height: 50,
-                 ),
-                 CircleAvatar(
-                   radius: 110.0,
-                   backgroundImage:
-                   AssetImage('assets/pj.png'),
-                   backgroundColor: Colors.transparent,
-                 ),
-                 SizedBox(
-                   height: 10,
-                 ),
-                 Text("Paul Jearic P. Niones",style:TextStyle(fontSize: 20),),
-                 SizedBox(
-                   height: 80,
-                 ),
-
-               ],
-             ),
-           ),
-            Text("For mobile app solutions call:09107961118",style:TextStyle(fontSize: 15),),
-          ],
+  Widget ProfileAvatar(double screenWidth, double avatarRadius, String imagePath, String name, String role) {
+    return FadeIn(
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: avatarRadius,
+            backgroundImage: AssetImage(imagePath),
+            backgroundColor: Colors.transparent,
+          ),
+          SizedBox(height: screenWidth * 0.01),
+          Text(name, style: TextStyle(fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold)),
+          Text(role, style: TextStyle(color: Colors.grey)),
+        ],
       ),
     );
   }
 }
 
+class FadeIn extends StatefulWidget {
+  final Widget child;
+  final Duration duration;
 
+  const FadeIn({@required this.child, this.duration = const Duration(milliseconds: 1000)});
+
+  @override
+  _FadeInState createState() => _FadeInState();
+}
+
+class _FadeInState extends State<FadeIn> with SingleTickerProviderStateMixin {
+  AnimationController _controller;
+  Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+    );
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+
+    _controller.forward(); // Start the animation
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _opacityAnimation,
+      child: widget.child,
+    );
+  }
+}
