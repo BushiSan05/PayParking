@@ -41,13 +41,9 @@ class _HistoryTransList extends State<HistoryTransList> {
     });
 
     if(syncData.isEmpty){
-//        print("way sud");
     }else{
-//      print(syncData[0]['syncDate']);
     }
-   }// to be delete soon
-
-
+   }
 
    Future insertSyncDate() async{
     await db.insertSyncDate(DateFormat("yyyy-MM-dd : hh:mm a").format(new DateTime.now()).toString());
@@ -230,13 +226,11 @@ class _HistoryTransList extends State<HistoryTransList> {
                                   new CupertinoTextField(
                                     autofocus: true,
                                     placeholder: "Username",
-
                                   ),
                                   Divider(),
                                   new CupertinoTextField(
                                     autofocus: true,
                                     placeholder: "Password",
-
                                     obscureText: true,
                                   ),
                                 ],
@@ -246,7 +240,6 @@ class _HistoryTransList extends State<HistoryTransList> {
                                     child: new Text("Proceed"),
                                     onPressed:(){
                                       Navigator.of(context).pop();
-
                                     }
                                 ),
                                 new TextButton(
@@ -282,7 +275,6 @@ class _HistoryTransList extends State<HistoryTransList> {
                                   Text('     Total : '+oCcy.format(totalAmount),style: TextStyle(fontSize: width/30),),
                                 ],
                               ),
-//                               trailing: Icon(Icons.more_vert),
                             ),
                           ],
                         ),
@@ -443,7 +435,6 @@ class _HistoryTransList extends State<HistoryTransList> {
                         margin: EdgeInsets.all(5),
                         elevation: 0.0,
                         child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             ListTile(
                               title:Text('$f.Plt No : ${plateData[index]["plateNumber"]}'.toUpperCase(),style: TextStyle(fontWeight: FontWeight.bold,fontSize:  width/20),),
@@ -476,27 +467,6 @@ class _HistoryTransList extends State<HistoryTransList> {
       ),
     );
   }
-
-  void choiceAction(String choice){
-    if(choice == Constants.dbSync){
-      promptSyncData();
-    }
-    if(choice == Constants.dbSync){
-      promptSyncData();
-    }
-  }
-
-  // void choiceAction1(String choice){
-  //   if(choice == Constants.dbSync){
-  //     promptSyncData();
-  //     // Navigator.push(
-  //     //   context,
-  //     //   MaterialPageRoute(builder: (context) => SyncingPage()),
-  //     // ).then((result) {
-  //     // });
-  //   }
-  //
-  // }
 
   void choiceAction1(String choice) {
     if (choice == Constants.dbSync) {

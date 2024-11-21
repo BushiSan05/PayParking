@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:signature/signature.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
@@ -97,9 +98,6 @@ class _Delinquent extends State<Delinquent>{
             controller: _secNameController,
               decoration: InputDecoration(
               labelText: 'Security Name',
-
-//              contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, width/15.0),
-//              border: OutlineInputBorder(borderRadius: BorderRadius.circular(50.0)),
               ),
             ),
           ),
@@ -168,27 +166,20 @@ class _Delinquent extends State<Delinquent>{
                                     print(imgGuard);
                                     Navigator.of(context).pop();
                                     Navigator.of(context).pop();
+                                    Fluttertoast.showToast(
+                                      msg: "Plate # (${widget.plateNo}) added to deliquent.",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      backgroundColor: Colors.black54,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0,
+                                    );
                                   },
                                 ),
                               ],
                             );
                           },
                         );
-                        //print(img);
-//                        print(data);
-//                        Navigator.of(context).push(
-//                          MaterialPageRoute(
-//                            builder: (BuildContext context) {
-//                              return Scaffold(
-//                                appBar: AppBar(),
-//                                body: Container(
-//                                  color: Colors.grey[300],
-//                                  child: Image.memory(data),
-//                                ),
-//                              );
-//                            },
-//                          ),
-//                        );
                       }
                       else{
                         showDialog(

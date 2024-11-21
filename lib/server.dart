@@ -4,7 +4,7 @@ class Server {
   //LIVE Address
  static const address       ='http://172.16.174.201:81/e_parking/';
 
-  //local addrress
+ //  local addrress
  // static const address ='http://172.16.43.154:81/';
 
 

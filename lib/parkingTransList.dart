@@ -811,9 +811,7 @@ class _ParkTransList extends State<ParkTransList>{
                                               new TextButton(
                                                 child: new Text("Proceed"),
                                                 onPressed:() async{
-//                                                    var res = await db.olManagerLogin(_managerKeyUser.text,_managerKeyUserPass.text);
                                                   var res = await db.ofManagerLogin(_managerKeyUser.text,_managerKeyUserPass.text);
-
                                                   setState(() {
                                                     data = res;
                                                   });
@@ -837,9 +835,8 @@ class _ParkTransList extends State<ParkTransList>{
                                                           // return object of type Dialog
                                                           return CupertinoAlertDialog(
                                                             title: new Text("Wrong credentials"),
-                                                            content: new Text("Please check your username and password"),
+                                                            content: new Text("Please check username and password"),
                                                             actions: <Widget>[
-                                                              // usually buttons at the bottom of the dialog
                                                               new TextButton(
                                                                 child: new Text("Close"),
                                                                 onPressed: () {

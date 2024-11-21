@@ -29,10 +29,17 @@ class _AboutState extends State<About> {
             children: <Widget>[
               SizedBox(height: spacingVertical),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(width: spacingHorizontal),
                   ProfileAvatar(screenWidth, avatarRadius, 'assets/maamnel.jpg', "Maria Neliza Fuertes", "Group Managing Director"),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(width: spacingHorizontal),
+                  ProfileAvatar(screenWidth, avatarRadius, 'assets/sirelison.jpg', "Elison Macatunao Tan", "Project Manager"),
                   SizedBox(width: spacingHorizontal),
                   ProfileAvatar(screenWidth, avatarRadius, 'assets/maamtina.jpg', "Maria Cristina C. Evarle", "Supervisor/System Analyst"),
                   SizedBox(height: spacingVertical),

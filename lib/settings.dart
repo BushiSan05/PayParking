@@ -48,7 +48,7 @@ class _Settings extends State<Settings>{
         backgroundColor: Colors.transparent,
         elevation: 0.0,
         centerTitle: true,
-        title: Text('Settings',style: TextStyle(fontWeight: FontWeight.bold,fontSize: width/28, color: Colors.black),),
+        title: Text('User',style: TextStyle(fontWeight: FontWeight.bold,fontSize: width/28, color: Colors.black),),
         textTheme: TextTheme(
               caption: TextStyle(
                   color: Colors.black,

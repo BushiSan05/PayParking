@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:payparkingv4/about2.dart';
 import 'package:payparkingv4/server.dart';
 import 'package:payparkingv4/update_screen.dart';
 import 'package:payparkingv4/utils/file_creator.dart';
@@ -35,11 +35,15 @@ class _SignInPageState extends State<SignInPage> {
   List data;
   bool btnUpdateClick = true;
   var version = AppUpdateVersion().versionNumber();
+  FocusNode myFocusNodeUser;
+  FocusNode myFocusNodePass;
 
+  // *** CREATES SQFLITE DATABASE ***
   Future createDatabase() async{
      await db.init();
   }
 
+  // *** REQUEST STORAGE PERMISSION ***
   void requestStoragePermission() async {
     PermissionStatus status = await Permission.storage.request();
 
@@ -70,10 +74,6 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Future logInAttempt() async{
-
-//    bool result = await DataConnectionChecker().hasConnection;
-//    if(result == true){
-//      var res = await db.mysqlLogin(_usernameController.text,_passwordController.text);
       var res = await db.ofLogin(_usernameController.text,_passwordController.text);
       setState(() {
         data = res;
@@ -85,9 +85,6 @@ class _SignInPageState extends State<SignInPage> {
                 context,
                 MaterialPageRoute(builder: (context) => HomeT(logInData:data[0]['empid'])),
           );
-
-//        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => HomeT(logInData:data[0]['empid'])));
-
       }
       if(data.isEmpty){
         Navigator.of(context).pop();
@@ -122,20 +119,18 @@ class _SignInPageState extends State<SignInPage> {
     createDatabase();
     fileCreate.createFolder();
     passwordVisible=true;
+    myFocusNodeUser = FocusNode();
+    myFocusNodePass = FocusNode();
   }
 
   @override
   void dispose() {
-    // Clean up the controller when the Widget is disposed
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> initPlatformState() async {
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
   }
 
@@ -154,8 +149,6 @@ class _SignInPageState extends State<SignInPage> {
         style: TextStyle(fontWeight: FontWeight.bold ,fontSize: width/13),
         textAlign: TextAlign.center);
 
-
-
     final username = Padding(
       padding:
       EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
@@ -163,8 +156,6 @@ class _SignInPageState extends State<SignInPage> {
         controller: _usernameController,
         decoration: InputDecoration(
           labelText: 'Username',
-//          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, width/15.0),
-//          border: OutlineInputBorder(borderRadius: BorderRadius.circular(50.0)),
         ),
       ),
     );
@@ -191,8 +182,6 @@ class _SignInPageState extends State<SignInPage> {
               );
             },
           ),
-//          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, width/15.0),
-//          border: OutlineInputBorder(borderRadius: BorderRadius.circular(50.0)),
         ),
       ),
     );
@@ -205,10 +194,6 @@ class _SignInPageState extends State<SignInPage> {
         child: CupertinoButton(
           child:  Text('Log in',style: TextStyle(fontWeight: FontWeight.bold,fontSize: width/20.0, color: Colors.lightBlue),),
           onPressed:() async{
-//            Navigator.push(
-//              context,
-//              MaterialPageRoute(builder: (context) => HomeT()),
-//            );
             log();
           },
         ),
@@ -216,7 +201,7 @@ class _SignInPageState extends State<SignInPage> {
     );
 
 
-    //For back button to exit the app
+    // *** BACK BUTTON TO EXIT DIALOG ***
     Future<bool> _onWillPop() async {
       return (await showDialog(
         context: context,
@@ -227,13 +212,10 @@ class _SignInPageState extends State<SignInPage> {
               actions: <Widget>[
                 TextButton(
                   onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
-                  // Navigator.of(context).pop(true),
-                  //<-- SEE HERE
                   child: new Text('Yes'),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  // <-- SEE HERE
                   child: new Text('No'),
                 ),
               ],
@@ -244,19 +226,14 @@ class _SignInPageState extends State<SignInPage> {
 
     return WillPopScope(
       onWillPop:  _onWillPop,
-      // onWillPop: () async {
-      //   return false;
-      // },
-
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0.0,
           centerTitle: true,
-//          title: Text(''),
           actions: <Widget>[
             PopupMenuButton<String>(
-              icon: Icon(Icons.settings_backup_restore, color: Colors.black),
+              icon: Icon(Icons.sync_outlined, color: Colors.black),
               onSelected: choiceAction,
               itemBuilder: (BuildContext context){
                 return Constants.choices.map((String choice){
@@ -306,7 +283,7 @@ class _SignInPageState extends State<SignInPage> {
     if(choice == Constants.about){
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => About()),
+        MaterialPageRoute(builder: (context) => About2()),
       );
     }
   }

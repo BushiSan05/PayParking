@@ -43,7 +43,7 @@ class _ParkTrans extends State<ParkTrans>{
 
   var allowCheckDigit = 0;
 
-
+  // *** 2 WHEELS SELECTED ***
    setWheelA() {
       setState(() {
         buttonBackColorA = Colors.lightBlue;
@@ -55,6 +55,7 @@ class _ParkTrans extends State<ParkTrans>{
       });
   }
 
+  // *** 4 WHEELS SELECTED ***
    setWheelB() {
     setState(() {
       buttonBackColorB = Colors.lightBlue;
@@ -65,9 +66,8 @@ class _ParkTrans extends State<ParkTrans>{
       wheel = 100;
     });
   }
-//buttonstyle
 
-
+ // *** LOCATION SELECTION LIST ***
   List<Widget> _getList() {
      String location = widget.location;
      var locCount = location.split(",").length;
@@ -130,6 +130,7 @@ class _ParkTrans extends State<ParkTrans>{
 //    }
 //  }
 
+  // *** ADD SELECTED LOCATION ***
    void addLocation() async{
        showDialog(
          barrierDismissible: true,
@@ -144,77 +145,19 @@ class _ParkTrans extends State<ParkTrans>{
        );
   }
 
-//  Future pickImage() async{
-//    plateNoController.clear();
-//    String platePattern = r"([A-Z|\d]+[\s|-][A-Z\d]+)"; //platenumber regex
-////    String platePattern =  r"([A-Z|\d]+[\s|-][0-9]+)";
-//    RegExp regEx = RegExp(platePattern);
-//    String platePatternNew;
-//    var _imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
-//    setState(() {F
-//      pickedImage = _imageFile;
-//    });
-//    if(_imageFile!=null){
-//      File croppedFile = await ImageCropper.cropImage(
-//          sourcePath: _imageFile.path,
-//          aspectRatioPresets: [
-//            CropAspectRatioPreset.square,
-//            CropAspectRatioPreset.ratio3x2,
-//            CropAspectRatioPreset.original,
-//            CropAspectRatioPreset.ratio4x3,
-//            CropAspectRatioPreset.ratio16x9
-//          ],
-//          androidUiSettings: AndroidUiSettings(
-//              toolbarTitle: 'Cropper',
-//              toolbarColor: Colors.white,
-//              toolbarWidgetColor: Colors.black,
-//              initAspectRatio: CropAspectRatioPreset.ratio16x9,
-//              lockAspectRatio: false),
-//          iosUiSettings: IOSUiSettings(
-//            minimumAspectRatio: 1.0,
-//          )
-//      );
-//
-//      setState(() {
-//        _imageFile = croppedFile ?? _imageFile;
-//      });
-//      if(croppedFile!=null){
-//      final image = FirebaseVisionImage.fromFile(croppedFile);
-//        TextRecognizer recognizedText = FirebaseVision.instance.textRecognizer();
-//        VisionText readText = await recognizedText.processImage(image);
-//        if(regEx.hasMatch(readText.text)){
-////          print(true);
-//          platePatternNew = readText.text;
-//          if(this.mounted){
-//            setState(() {
-////              print(regEx.firstMatch(platePatternNew).group(0));
-//              plateNoController.text = regEx.firstMatch(platePatternNew).group(0);
-//              recognizedText.close();
-//            });
-//          }
-//        }
-//        else{
-//          print(false);
-//        }
-//      }else{
-//        print('No cropped image');
-//      }
-//    }else{
-//      print('No image');
-//    }
-//  }
-
+  // *** SLIDE TO CONFIRM ***
   TextEditingController plateNoController = TextEditingController();
   void confirmed(){
     if(isSwitched == false && plateNoController.text == "" || locationA == "Location"){
-//      var today = new DateTime.now();
-//      var dateToday = DateFormat("yyyy-MM-dd").format(new DateTime.now());
-//      var dateUntil = DateFormat("yyyy-MM-dd").format(today.add(new Duration(days: 7)));
-//      print(dateToday);
-//      print(dateUntil);
-//      print(selectedRadio);
-    }
-    else {
+      Fluttertoast.showToast(
+        msg: "Please complete the details before proceeding.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
       if(wheel == 0){
       }else{
           saveData();
@@ -272,6 +215,7 @@ class _ParkTrans extends State<ParkTrans>{
     return x.toString()+""+n.toString();
   }
 
+  // *** PROCEED TO PRINT COUPON ***
   void saveData() async{
       var uid = DateFormat("yyMMdHms").format(new DateTime.now());
       String plateNumber;
@@ -290,21 +234,16 @@ class _ParkTrans extends State<ParkTrans>{
       var empId = widget.empId;
       var fName = widget.empNameFn;
       Key key;
-//    var dateTodayP = DateFormat("yyyy-MM-dd").format(new DateTime.now());
-//    var dateTimeTodayP = DateFormat("jm").format(new DateTime.now());
-//    var dateUntilP = DateFormat("yyyy-MM-dd").format(today.add(new Duration(days: 7)));
-      //check digit
 
       var checkDigitNum = int.parse('$year$month$day$hour$minute$second');
       var checkDigitResult = create(checkDigitNum);
-      //check digit
 
-      // Define app package names
+      // *** PRINTER PACKAGE NAMES ***
       String oldPrinterPackageName = "com.example.cpcl_test_v1";
       String newPrinterPackageName = "com.example.cpcl_test_v2";
       String zebraPrinterPackageName = "com.example.cpcl_test_v3";
 
-      // Check if each app is installed
+      // *** CHECK PRINTER IF INSTALLED ***
       bool isOldPrinterInstalled = await DeviceApps.isAppInstalled(oldPrinterPackageName);
       bool isNewPrinterInstalled = await DeviceApps.isAppInstalled(newPrinterPackageName);
       bool isZebraPrinterInstalled = await DeviceApps.isAppInstalled(zebraPrinterPackageName);
@@ -317,6 +256,7 @@ class _ParkTrans extends State<ParkTrans>{
         print(plateNumber);
       }
 
+    // *** SELECT PRINTER DIALOG ***
     String locationAnew = locationA;
     Future<void> handlePrinterSelection(
         BuildContext context,
@@ -334,15 +274,14 @@ class _ParkTrans extends State<ParkTrans>{
                 onPressed: () async {
                   Navigator.of(context).pop();
 
-                  // Clear the plate number field
                   plateNoController.text = "";
 
-                  // Save transaction
+                  // *** SAVE TRANSACTION ON TEXTFILE ***
                   await db.ofSaveTransaction(uid, checkDigitResult, plateNumber, dateToday, dateTimeToday, dateUntil, amount, empId, fName, stat, locationAnew);
                   await fileCreate.transactionTypeFunc('print_coupon');
                   await fileCreate.transactionsFunc(uid, checkDigitResult, plateNumber, dateToday, dateTimeToday, dateUntil, amount, empId, locationAnew);
 
-                  // Open the external app
+                  // *** OPENS THE PRINTER APP ***
                   await DeviceApps.openApp(packageName).then((_) {
                     Fluttertoast.showToast(
                       msg: "Successfully added to transactions",
@@ -353,7 +292,6 @@ class _ParkTrans extends State<ParkTrans>{
                       fontSize: 16.0,
                     );
                   });
-
                   print("PRINTING");
                   locationA = "Location";
                 },
@@ -370,6 +308,7 @@ class _ParkTrans extends State<ParkTrans>{
       );
     }
 
+    // *** SELECT PRINTER ***
         showDialog(
           barrierDismissible: false,
           context: context,
@@ -434,7 +373,6 @@ class _ParkTrans extends State<ParkTrans>{
   @override
   void initState(){
     super.initState();
-//    trapLocation();
   }
 
   @override
@@ -448,6 +386,7 @@ class _ParkTrans extends State<ParkTrans>{
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
+    // *** 4 WHEELS BUTTON STYLE ***
     final ButtonStyle flatButtonStyle4wheels = TextButton.styleFrom(
       primary: Colors.lightBlue,
       onSurface: Colors.lightBlue,
@@ -457,15 +396,10 @@ class _ParkTrans extends State<ParkTrans>{
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(35.0)),
           side: BorderSide(color: Colors.lightBlue)
-        /*
-            padding: EdgeInsets.symmetric(horizontal: width/15.0,vertical: 20.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(35.0),
-                        side: BorderSide(color: Colors.lightBlue)
-                    ),
-        * */
       )
     );
+
+    // *** 2 WHEELS BUTTON STYLE ***
     final ButtonStyle flatButtonStyle2wheels = TextButton.styleFrom(
         primary: Colors.lightBlue,
         onSurface: Colors.lightBlue,
@@ -475,33 +409,21 @@ class _ParkTrans extends State<ParkTrans>{
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(35.0)),
             side: BorderSide(color: Colors.lightBlue)
-          /*
-            padding: EdgeInsets.symmetric(horizontal: width/15.0,vertical: 20.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(35.0),
-                        side: BorderSide(color: Colors.lightBlue)
-                    ),
-        * */
         )
     );
+
+    // *** LOCATION BUTTON STYLE ***
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
         primary: Colors.lightBlue,
         onSurface: Colors.lightBlue,
-        // backgroundColor: bground2,
         minimumSize: Size(88, 36),
         padding: EdgeInsets.symmetric(horizontal: width/15.0,vertical: 20.0),
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(35.0)),
             side: BorderSide(color: Colors.lightBlue)
-          /*
-            padding: EdgeInsets.symmetric(horizontal: width/15.0,vertical: 20.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(35.0),
-                        side: BorderSide(color: Colors.lightBlue)
-                    ),
-        * */
         )
     );
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -513,43 +435,14 @@ class _ParkTrans extends State<ParkTrans>{
             style: ButtonStyle(
               foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
             ),
-            onPressed: () {},
+            // onPressed: () {},
             child: Text(widget.name.toString(),style: TextStyle(fontSize: width/36,color: Colors.black),),
           ),
         ],
 
       ),
       body: ListView(
-//          physics: BouncingScrollPhysics(),
           children: <Widget>[
-//      SingleChildScrollView(
-//        scrollDirection: Axis.horizontal,
-//        child: Row(
-//            children: <Widget>[
-//              Padding(
-//                padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 30.0),
-//                child: MaterialButton(
-//                  height: 40.0,
-//                  onPressed:(){},
-//                  child:FlatButton.icon(
-//                    label: Text('Open Camera',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15.0, color: Colors.lightBlue),),
-//                    splashColor: Colors.lightBlue,
-//                    icon: Icon(Icons.camera_alt, color: Colors.lightBlue,),
-//                    padding: EdgeInsets.all(14.0),
-//                    shape: RoundedRectangleBorder(
-//                        borderRadius: new BorderRadius.circular(35.0),
-//                        side: BorderSide(color: Colors.lightBlue)
-//                    ),
-//                    onPressed:(){
-//                      pickImage();
-//                    },
-//                  ),
-//                ),
-//              ),
-//            ],
-//        ),
-//      ),
-
           Padding(padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 3.0),
               child: new TextFormField(
 
@@ -573,10 +466,12 @@ class _ParkTrans extends State<ParkTrans>{
             color: Colors.transparent,
             height: 15.0,
           ),
+
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
               child:Text('Vehicle Type & Location',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,color: Colors.black45),),
           ),
+
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
               child:Column(
@@ -604,41 +499,20 @@ class _ParkTrans extends State<ParkTrans>{
                     activeColor: Colors.lightBlue,
                   ),
                  ),
-
                   Text("   "),
-
                   TextButton.icon(
                     label: Text('4 wheels'.toString(),style: TextStyle(fontSize: width/33.0, color: textColorA),),
-                    // splashColor: Colors.lightBlue,
                     style: flatButtonStyle4wheels,
-                    // style:ButtonStyle(
-                    //   // overlayColor: MaterialStateColor.resolveWith((states) => Colors.lightBlue),
-                    //   // splashFactory:
-                    //   splashFactory: InkRipple.splashFactory,
-                    //   overlayColor: MaterialStateProperty.resolveWith<Color>(
-                    //         (Set<MaterialState> states) {
-                    //       return states.contains(MaterialState.focused) ? null : Colors.lightBlue;
-                    //     },
-                    //   ),
-                    // ),
                     icon: Icon(Icons.directions_car, color: textColorA,size: width/20.0,),
                     onPressed:(){
                       setWheelB();
-
                     },
                   ),
                 Text("   "),
                   TextButton.icon(
                     label: Text('2 wheels'.toString(),style: TextStyle(fontSize: width/33.0, color: textColorB),),
                    style: flatButtonStyle2wheels,
-                   // splashColor: Colors.lightBlue,
-                 //   color: buttonBackColorA,
                     icon: Icon(Icons.motorcycle, color: textColorB,size: width/20.0,),
-                    // padding: EdgeInsets.symmetric(horizontal:width/15.0,vertical: 20.0),
-                    // shape: RoundedRectangleBorder(
-                    //     borderRadius: new BorderRadius.circular(35.0),
-                    //     side: BorderSide(color: Colors.lightBlue)
-                    // ),
                     onPressed:(){
                       setWheelA();
                     },
@@ -646,22 +520,16 @@ class _ParkTrans extends State<ParkTrans>{
                 Text("   "),
                   TextButton.icon(
                     label: Text(locationA.toString(),style: TextStyle(fontSize: width/33.0, color: Colors.black45),),
-                 //   splashColor: Colors.lightBlue,
                     style: flatButtonStyle,
                     icon: Icon(Icons.location_on, color: Colors.black45,size: width/20.0,),
-                    // padding: EdgeInsets.symmetric(horizontal:width/15.0,vertical: 20.0),
-                    // shape: RoundedRectangleBorder(
-                    //     borderRadius: new BorderRadius.circular(35.0),
-                    //     side: BorderSide(color: Colors.lightBlue)
-                    // ),
                     onPressed: addLocation,
                   ),
-              ]),
+              ],
+              ),
             ),
 
             Padding( padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20.0),
               child: Container(
-//              width: 400.0,
                 child: ConfirmationSlider(
                   shadow:BoxShadow(color: Colors.black38, offset: Offset(1, 0),blurRadius: 1,spreadRadius: 1,),
                   foregroundColor:Colors.blue,
