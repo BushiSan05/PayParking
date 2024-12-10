@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter/cupertino.dart';
@@ -212,7 +213,14 @@ class _ParkTrans extends State<ParkTrans>{
       }
     }
     int n=cv2-total;
-    return x.toString()+""+n.toString();
+
+    // Add two random letters
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var random = Random();
+    String randomLetters = letters[random.nextInt(letters.length)] +
+        letters[random.nextInt(letters.length)];
+
+    return 'AC' + x.toString() + n.toString() + randomLetters;
   }
 
   // *** PROCEED TO PRINT COUPON ***

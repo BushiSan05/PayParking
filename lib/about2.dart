@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:payparkingv4/server.dart';
 
 class About2 extends StatefulWidget {
   @override
@@ -21,7 +23,19 @@ class _AboutState extends State<About2> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('ABOUT US'),
+        title: GestureDetector(
+          onTap: () {
+            Fluttertoast.showToast(
+              msg: Server.address,
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              backgroundColor: Colors.black54,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+          },
+          child: Text("About Us"),
+        )
       ),
       body: SingleChildScrollView(
         child: Center(
